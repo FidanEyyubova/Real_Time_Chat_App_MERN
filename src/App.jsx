@@ -6,7 +6,7 @@ import ProfilePage from "./pages/ProfilePage";
 
 const App = () => {
   return (
-    <div className="min-h-screen bg-[linear-gradient(-30deg,_rgba(2,0,36,1)_0%,_rgba(9,9,121,1)_35%,_rgba(0,212,255,1)_100%)]">
+    <div className="min-h-screen bg-[url('/src/assets/images/dark.jpg')] bg-cover bg-center">
       <Routes>
         <Route path="/" element={<HomePage />} />
         <Route path="/login" element={<LoginPage />} />
