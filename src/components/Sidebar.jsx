@@ -1,6 +1,6 @@
 import React from "react";
 import { useNavigate } from "react-router-dom";
-import { userData } from "../../public/data/data";
+import assets, { userData } from "../assets/data";
 
 const Sidebar = ({ selectedUser, setSelectedUser }) => {
   const navigate = useNavigate();
@@ -14,7 +14,7 @@ const Sidebar = ({ selectedUser, setSelectedUser }) => {
         <div className="flex justify-between items-center">
           <div className="flex gap-2 items-center">
             <img
-              src={"./src/assets/svg/favicon.svg"}
+              src={assets.favicon}
               alt="ChitChat-logo"
               className="max-w-6"
             />
@@ -22,7 +22,7 @@ const Sidebar = ({ selectedUser, setSelectedUser }) => {
           </div>
           <div className="relative py-2 group">
             <img
-              src={"/src/assets/images/menu_icon.png"}
+              src={assets.menu_icon}
               alt="Menu-bar"
               className="max-h-5 cursor-pointer"
             />
@@ -46,7 +46,7 @@ const Sidebar = ({ selectedUser, setSelectedUser }) => {
         </div>
         <div className="bg-[#282142] rounded-full flex items-center gap-2 py-3 px-4 mt-5">
           <img
-            src={"/src/assets/images/search_icon.png"}
+            src={assets.search_icon}
             alt="ChitChat-logo"
             className="w-3"
           />

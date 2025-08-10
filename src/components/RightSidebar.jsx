@@ -15,7 +15,7 @@ const RightSidebar = ({ selectedUser }) => {
           <p className='w-2 h-2 rounded-full bg-green-500'></p>
           {selectedUser.name}
         </h1>
-        <p className='px-10 mx-auto'>{selectedUser.bio}</p>
+        <p className='px-10 mx-auto text-center'>{selectedUser.bio}</p>
       </div>
 
       <hr className='border-[#ffffff50] my-4' />

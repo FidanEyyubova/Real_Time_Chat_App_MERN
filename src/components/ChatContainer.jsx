@@ -1,5 +1,5 @@
 import React, { useEffect, useRef } from "react";
-import { messageData } from "../../public/data/data.js";
+import assets, { messageData } from "../assets/data";
 import { messageTime } from "../lib/utils";
 
 const ChatContainer = ({ selectedUser, setSelectedUser }) => {
@@ -15,7 +15,7 @@ const ChatContainer = ({ selectedUser, setSelectedUser }) => {
     <div className="h-fulloverflow-scroll relative backdrop-blur-lg">
       <div className="flex items-center gap-3 py-3 mx-4 border-b border-stone-500">
         <img
-          src={"/src/assets/images/women1.jpg"}
+          src={assets.woman1}
           alt=""
           className="w-8 rounded-full"
         />
@@ -26,12 +26,12 @@ const ChatContainer = ({ selectedUser, setSelectedUser }) => {
 
         <img
           onClick={() => setSelectedUser(null)}
-          src={"/src/assets/images/arrow_icon.png"}
+          src={assets.arrow_icon}
           alt={""}
           className="md:hidden max-w-7"
         />
         <img
-          src={"/src/assets/images/help_icon.png"}
+          src={assets.help_icon}
           alt=""
           className="max-md:hidden max-w-5"
         />
@@ -66,8 +66,8 @@ const ChatContainer = ({ selectedUser, setSelectedUser }) => {
               <img
                 src={
                   message.senderID === "1"
-                    ? "/src/assets/images/avatar_icon.png"
-                    : "/src/assets/images/women1.jpg"
+                    ? assets.avatar_icon
+                    : assets.woman1
                 }
                 alt=""
                 className="w-7 rounded-full"
@@ -89,14 +89,14 @@ const ChatContainer = ({ selectedUser, setSelectedUser }) => {
           <input type="file" id="image" accept="image/png, image/jpeg" hidden />
           <label htmlFor="image">
             <img
-              src={"src/assets/svg/gallery_icon.svg"}
+              src={assets.gallery_icon}
               alt=""
               className="w-5 mr-2 cursor-pointer"
             />
           </label>
         </div>
         <img
-          src={"/src/assets/svg/send_button.svg"}
+          src={assets.send_button}
           alt=""
           className="w-7 cursor-pointer"
         />
@@ -104,7 +104,7 @@ const ChatContainer = ({ selectedUser, setSelectedUser }) => {
     </div>
   ) : (
     <div className="flex flex-col items-center justify-center gap-2 text-gray-500 bg-white/10 max-md:hidden">
-      <img src={"/src/assets/svg/logo_icon.svg"} alt="" className="max-w-16" />
+      <img src={assets.logo_icon} alt="" className="max-w-16" />
       <p className="text-lg font-medium text-white">Chat anytime, anywhere!</p>
     </div>
   );
