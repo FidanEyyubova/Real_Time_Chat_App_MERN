@@ -37,11 +37,11 @@ const ChatContainer = ({ selectedUser, setSelectedUser }) => {
         />
       </div>
       {/* !Chat area */}
-      <div className="flex flex-col h-[calc(100%-120px)] overflow-y-scroll p-3 pb-6">
+      <div className="flex flex-col gap-2 h-[calc(100%-120px)] overflow-y-scroll p-5 pb-6">
         {messageData.map((message, index) => (
           <div
             key={index}
-            className={`flex items-end gap-2 justify-end ${
+            className={`flex items-center gap-2 justify-end ${
               message.senderID !== "1" && "flex-row-reverse"
             }`}
           >
@@ -64,15 +64,15 @@ const ChatContainer = ({ selectedUser, setSelectedUser }) => {
             )}
             <div className="text-center text-xs">
               <img
-                src={
-                  message.senderID === "1"
-                    ? assets.avatar_icon
-                    : assets.woman1
-                }
-                alt=""
-                className="w-7 rounded-full"
-              />
-              <p className="text-gray-500">{messageTime(message.createdAt)}</p>
+  src={
+    message.senderID === "1"
+      ? assets.avatar_icon
+      : assets.woman1
+  }
+  alt=""
+  className={`rounded-full ${message.senderID === "1" ? "w-8" : "w-9"}`}
+/>
+              <p className="text-gray-500 mt-1">{messageTime(message.createdAt)}</p>
             </div>
           </div>
         ))}

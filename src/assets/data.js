@@ -51,21 +51,21 @@ export const userData = [
         "email" : "test2@chitchat.dev",
         "name" : "Nigar Quliyeva",
         "profilePic" : woman2,
-        "bio": "Hi Everyone, I am UI/UX designer!"
+        "bio": "Hi Everyone, I am a Data Analyst!"
     },
     {
         "id" : "3",
         "email" : "test3@chitchat.dev",
         "name" : "Elvin Hüseynov",
         "profilePic" : man1,
-        "bio": "Hi Everyone, I am UI/UX designer!"
+        "bio": "Hi Everyone, I am a Software Developer!"
     },
      {
         "id" : "4",
         "email" : "test4@chitchat.dev",
         "name" : "Rauf Əliyev",
         "profilePic" : man2,
-        "bio": "Hi Everyone, I am UI/UX designer!"
+        "bio": "Hi Everyone, I am a Cybersecurity Specialist!"
     },
 ]
 
@@ -74,7 +74,7 @@ export const messageData = [
         "id" : "1",
         "senderID" : "1",
         "receiverID" : "1",
-        "text" : "The sun sets very fast.",
+        "text" : "Salam",
         "seen" : "true",
         "createdAt" : "2025-04-28T10:23:37.301Z"
     },
@@ -82,7 +82,7 @@ export const messageData = [
         "id" : "2",
         "senderID" : "2",
         "receiverID" : "2",
-        "text" : "The sun sets very fast.",
+        "text" : "Salam",
         "seen" : "true",
         "createdAt" : "2025-04-28T10:23:38.301Z"
     },
@@ -90,7 +90,7 @@ export const messageData = [
         "id" : "3",
         "senderID" : "3",
         "receiverID" : "3",
-        "text" : "The sun sets very fast.",
+        "text" : "Necesen",
         "seen" : "true",
         "createdAt" : "2025-04-28T10:23:39.301Z"
     },
@@ -98,7 +98,7 @@ export const messageData = [
         "id" : "4",
         "senderID" : "4",
         "receiverID" : "4",
-        "text" : "The sun sets very fast.",
+        "text" : "Neynirsen",
         "seen" : "true",
         "createdAt" : "2025-04-28T10:23:40.301Z"
     }

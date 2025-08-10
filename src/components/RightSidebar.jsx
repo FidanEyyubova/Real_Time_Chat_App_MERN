@@ -1,4 +1,5 @@
 import React from 'react';
+import { imagesData } from '../assets/data';
 
 const RightSidebar = ({ selectedUser }) => {
   return selectedUser && (
@@ -23,7 +24,7 @@ const RightSidebar = ({ selectedUser }) => {
       <div className='px-5 text-xs'>
         <p>Media</p>
         <div className='mt-2 max-h-[200px] overflow-y-scroll grid grid-cols-2 gap-4 opacity-80'>
-          {/* {imagesData.map((url, index) => (
+          {imagesData.map((url, index) => (
             <div
               key={index}
               onClick={() => window.open(url)}
@@ -31,9 +32,14 @@ const RightSidebar = ({ selectedUser }) => {
             >
               <img src={url} alt="" className='h-full rounded-md' />
             </div>
-          ))} */}
+          ))}
         </div>
       </div>
+      <button className='absolute bottom-5 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-purple-400 to-violet-600 text-white
+      border-none text-sm font-light py-2 px-20 rounded-full cursor-pointer
+      '>
+        Logout
+      </button>
     </div>
   );
 };
