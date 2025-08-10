@@ -27,7 +27,7 @@ const Sidebar = ({ selectedUser, setSelectedUser }) => {
               className="max-h-5 cursor-pointer"
             />
             <div
-              className="absolute top-full right-0 z-20 w-32 p-5 rounded-md bg-[#282142] border border-gray-600 text-gray-100 
+              className="absolute top-full right-0 z-20 w-32 p-5 rounded-md bg-[#212942] border border-gray-600 text-gray-100 
                opacity-0 scale-95 pointer-events-none group-hover:opacity-100 group-hover:scale-100 group-hover:pointer-events-auto 
                transition-all duration-200 ease-out origin-top-right"
             >
@@ -44,7 +44,7 @@ const Sidebar = ({ selectedUser, setSelectedUser }) => {
             </div>
           </div>
         </div>
-        <div className="bg-[#282142] rounded-full flex items-center gap-2 py-3 px-4 mt-5">
+        <div className="bg-[#212942] rounded-full flex items-center gap-2 py-3 px-4 mt-5">
           <img
             src={assets.search_icon}
             alt="ChitChat-logo"
@@ -68,7 +68,7 @@ const Sidebar = ({ selectedUser, setSelectedUser }) => {
             }}
             key={index}
             className={`relative flex items-center gap-2 p-2 pl-4 rounded cursor-pointer max-sm:text-sm
-          ${selectedUser?.id === user.id && "bg-[#282142]/50"}
+          ${selectedUser?.id === user.id && "bg-[#212942]/50"}
           `}
           >
             <img
@@ -87,7 +87,7 @@ const Sidebar = ({ selectedUser, setSelectedUser }) => {
             {index > 2 && (
               <p
                 className="
-          absolute top-4 right-4 text-xs h-5 w-5 flex justify-center items-center rounded-full bg-violet-500/50"
+          absolute top-4 right-4 text-xs h-5 w-5 flex justify-center items-center rounded-full bg-[#3f8cb0]"
               >
                 {index}
               </p>

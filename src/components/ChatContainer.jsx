@@ -53,7 +53,7 @@ const ChatContainer = ({ selectedUser, setSelectedUser }) => {
               />
             ) : (
               <p
-                className={`p-2 max-w-[200px] md:text-sm font-light rounded-lg mb-8 break-all bg-violet-500/30 text-white ${
+                className={`p-2 max-w-[200px] md:text-sm font-light rounded-lg mb-8 break-all bg-[#212942] text-white ${
                   message.senderID === "1"
                     ? "rounded-br-none"
                     : "rounded-bl-none"
