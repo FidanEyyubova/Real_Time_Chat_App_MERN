@@ -69,7 +69,7 @@ const LoginPage = () => {
               required
             />
             <input
-              type="text"
+              type="password"
               onChange={(e) => setPassword(e.target.value)}
               value={password}
               className="p-2 border border-gray-500 rounded-md focus:outline-none 
@@ -83,6 +83,7 @@ const LoginPage = () => {
         {logstate === "Sign Up" && dataSubmitted && (
           <textarea
             onChange={(e) => setBio(e.target.value)}
+            value={bio}
             rows={4}
             className="p-2 border border-gray-500 rounded-md focus:outline-none
             "
