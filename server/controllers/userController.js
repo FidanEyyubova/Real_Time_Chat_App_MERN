@@ -3,6 +3,7 @@ import User from "../models/User";
 import bcrypt from "bcryptjs";
 
 //! Signup a new user
+
 export const signup = async (req, res) => {
   const { fullname, email, password, bio } = req.body;
   try {
@@ -30,6 +31,33 @@ export const signup = async (req, res) => {
       userData: newUser,
       token,
       message: "Account created succesfully!",
+    });
+  } catch (error) {
+    console.log(error.message);
+    res.json({ success: false, message: error.message });
+  }
+};
+
+//! Signin a user
+
+export const login = async (req, res) => {
+  try {
+    const { email, password } = req.body;
+    const userData = await User.findOne({ email });
+
+    const isPasswordCorrect = await bcrypt.compare(password, userData.password);
+
+    if (!isPasswordCorrect) {
+      return res.json({ success: false, message: "Invalid credentials" });
+    }
+
+    const token = generateToken(userData._id);
+
+    res.json({
+      success: true,
+      userData,
+      token,
+      message: "Login succesful!",
     });
   } catch (error) {
     console.log(error.message);
