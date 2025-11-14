@@ -1,8 +1,10 @@
-import React from "react";
+import React, { useContext } from "react";
 import { useNavigate } from "react-router-dom";
 import assets, { userData } from "../assets/data";
+import { AuthContext } from "../../context/AuthContext";
 
 const Sidebar = ({ selectedUser, setSelectedUser }) => {
+  const { logout } = useContext(AuthContext);
   const navigate = useNavigate();
   return (
     <div
@@ -13,11 +15,7 @@ const Sidebar = ({ selectedUser, setSelectedUser }) => {
       <div className="pb-5">
         <div className="flex justify-between items-center">
           <div className="flex gap-2 items-center">
-            <img
-              src={assets.favicon}
-              alt="ChitChat-logo"
-              className="max-w-6"
-            />
+            <img src={assets.favicon} alt="ChitChat-logo" className="max-w-6" />
             <h1>ChitChat</h1>
           </div>
           <div className="relative py-2 group">
@@ -38,18 +36,17 @@ const Sidebar = ({ selectedUser, setSelectedUser }) => {
                 Edit Profile
               </p>
               <hr className="my-2 border-t border-gray-500" />
-              <p className="cursor-pointer text-sm transition-transform duration-200 hover:scale-110">
+              <p
+                onClick={() => logout()}
+                className="cursor-pointer text-sm transition-transform duration-200 hover:scale-110"
+              >
                 Logout
               </p>
             </div>
           </div>
         </div>
         <div className="bg-[#212942] rounded-full flex items-center gap-2 py-3 px-4 mt-5">
-          <img
-            src={assets.search_icon}
-            alt="ChitChat-logo"
-            className="w-3"
-          />
+          <img src={assets.search_icon} alt="ChitChat-logo" className="w-3" />
           <input
             type="text"
             alt="Search"

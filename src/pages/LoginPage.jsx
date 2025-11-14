@@ -1,5 +1,6 @@
-import React, { useState } from "react";
+import React, { useContext, useState } from "react";
 import assets from "../assets/data";
+import { AuthContext } from "../../context/AuthContext";
 
 const LoginPage = () => {
   const [logstate, setLogState] = useState("Sign Up");
@@ -9,6 +10,8 @@ const LoginPage = () => {
   const [bio, setBio] = useState("");
   const [dataSubmitted, setDataSubmitted] = useState(false);
 
+  const { login } = useContext(AuthContext);
+
   const datastateSubmit = (e) => {
     e.preventDefault();
 
@@ -16,6 +19,12 @@ const LoginPage = () => {
       setDataSubmitted(true);
       return;
     }
+    login(logstate === "Sign Up" ? "signup" : "login", {
+      fullName,
+      email,
+      password,
+      bio,
+    });
   };
 
   return (
@@ -31,7 +40,8 @@ const LoginPage = () => {
         />
         <h1 className="text-4xl text-white">ChitChat</h1>
       </div>
-      <form onSubmit={datastateSubmit}
+      <form
+        onSubmit={datastateSubmit}
         className="border-2 bg-white/8 text-white border-gray-500 p-6 flex flex-col
           gap-6 rounded-lg shadow-lg"
       >

@@ -1,16 +1,38 @@
-import { useState } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import assets from "../assets/data";
+import { AuthContext } from "../../context/AuthContext";
 
 const ProfilePage = () => {
+  const { authUser, updateProfile } = useContext(AuthContext);
   const [selectedImg, setSelectedImg] = useState(null);
   const navigate = useNavigate();
-  const [name, setName] = useState("Aylin Əliyeva");
-  const [bio, setBio] = useState("Hi Everyone, I am UI/UX designer!");
+  const [name, setName] = useState("");
+  const [bio, setBio] = useState("");
+
+  useEffect(() => {
+  if (authUser) {
+    setName(authUser.fullName);
+    setBio(authUser.bio);
+  }
+}, [authUser]);
+
 
   const handleSubmit = async (e) => {
     e.preventDefault();
-    navigate("/");
+    if (!selectedImg) {
+      await updateProfile({ fullName: name, bio });
+      navigate("/");
+      return;
+    }
+
+    const reader = new FileReader();
+    reader.readAsDataURL(selectedImg);
+    reader.onload = async () => {
+      const base64Image = reader.result;
+      await updateProfile({ profilePic: base64Image, fullName: name, bio });
+      navigate("/");
+    };
   };
 
   return (
@@ -20,7 +42,10 @@ const ProfilePage = () => {
       flex items-center justify-between max-sm:flex-col-reverse rounded-lg
       "
       >
-        <form onSubmit={handleSubmit} className="flex flex-col gap-7 p-10 flex-1">
+        <form
+          onSubmit={handleSubmit}
+          className="flex flex-col gap-7 p-10 flex-1"
+        >
           <h3 className="text-lg">Profile Details</h3>
           <label
             htmlFor="avatar"
@@ -67,11 +92,16 @@ const ProfilePage = () => {
             Save
           </button>
         </form>
-        <img
-          src={assets.logo_icon}
-          alt=""
-          className="max-w-44 aspect-square mx-10 max-sm:mt-10"
-        />
+       <img
+  src={
+    selectedImg
+      ? URL.createObjectURL(selectedImg) // show the new selected file immediately
+      : authUser?.profilePic || assets.logo_icon // fallback to existing profile pic
+  }
+  alt=""
+  className={`max-w-44 aspect-square mx-10 max-sm:mt-10 ${selectedImg && "rounded-full"}`}
+/>
+
       </div>
     </div>
   );
