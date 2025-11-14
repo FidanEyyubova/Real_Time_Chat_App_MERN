@@ -6,9 +6,9 @@ import bcrypt from "bcryptjs";
 //! Signup a new user
 
 export const signup = async (req, res) => {
-  const { fullname, email, password, bio } = req.body;
+  const { fullName, email, password, bio } = req.body;
   try {
-    if (!fullname || !email || !password || !bio) {
+    if (!fullName || !email || !password || !bio) {
       return res.json({ success: false, message: "Missing Details" });
     }
     const user = await User.findOne({ email });
@@ -16,10 +16,10 @@ export const signup = async (req, res) => {
       return res.json({ success: false, message: "Account already exists" });
     }
     const salt = await bcrypt.genSalt(10);
-    const hashedPassword = await bcrypt.hash(passsword, salt);
+    const hashedPassword = await bcrypt.hash(password, salt);
 
     const newUser = await User.create({
-      fullname,
+      fullName,
       email,
       password: hashedPassword,
       bio,
@@ -75,14 +75,14 @@ export const checkAuth = (req, res) => {
 //!Controller to update user profile details
 export const updateProfile = async (req, res) => {
   try {
-    const { profilePic, fullname, bio } = req.body;
+    const { profilePic, fullName, bio } = req.body;
     const userID = req.user._id;
     let updatedUser;
 
     if (!profilePic) {
       updatedUser = await User.findByIdAndUpdate(
         userID,
-        { fullname, bio },
+        { fullName, bio },
         { new: true }
       );
     } else {
@@ -92,7 +92,7 @@ export const updateProfile = async (req, res) => {
         {
           profilePic: upload.secure_url,
           bio,
-          fullname,
+          fullName,
         },
         { new: true }
       );
