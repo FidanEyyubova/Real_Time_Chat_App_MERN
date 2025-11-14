@@ -1,15 +1,36 @@
-import React, { useContext } from "react";
+import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import assets, { userData } from "../assets/data";
+import assets from "../assets/data";
 import { AuthContext } from "../../context/AuthContext";
+import { ChatContext } from "../../context/ChatContext";
 
-const Sidebar = ({ selectedUser, setSelectedUser }) => {
-  const { logout } = useContext(AuthContext);
+const Sidebar = () => {
+  const {
+    getUsers,
+    users,
+    selectedUsers,
+    setSelectedUsers,
+    unseenMessages,
+    setUnseenMessages,
+  } = useContext(ChatContext);
+  const { logout, onlineUsers } = useContext(AuthContext);
+  const [input, setInput] = useState(false);
   const navigate = useNavigate();
+
+  const filteredUsers = input
+    ? users.filter((user) =>
+        user.fullName.toLowerCase().includes(input.toLowerCase())
+      )
+    : users;
+
+  useEffect(() => {
+    getUsers();
+  }, [onlineUsers]);
+
   return (
     <div
       className={`bg-[#8185B2]/10 h-full p-5 rounded-l-xl overflow-y-scroll text-white
-    ${selectedUser ? "max-md:hidden" : ""}
+    ${selectedUsers ? "max-md:hidden" : ""}
     `}
     >
       <div className="pb-5">
@@ -48,6 +69,7 @@ const Sidebar = ({ selectedUser, setSelectedUser }) => {
         <div className="bg-[#212942] rounded-full flex items-center gap-2 py-3 px-4 mt-5">
           <img src={assets.search_icon} alt="ChitChat-logo" className="w-3" />
           <input
+            onChange={(e) => setInput(e.target.value)}
             type="text"
             alt="Search"
             className="bg-transparent border-none outline-none
@@ -58,14 +80,12 @@ const Sidebar = ({ selectedUser, setSelectedUser }) => {
       </div>
 
       <div className="flex flex-col">
-        {userData.map((user, index) => (
+        {filteredUsers.map((user, index) => (
           <div
-            onClick={() => {
-              setSelectedUser(user);
-            }}
+            onClick={() => setSelectedUsers(user)}
             key={index}
             className={`relative flex items-center gap-2 p-2 pl-4 rounded cursor-pointer max-sm:text-sm
-          ${selectedUser?.id === user.id && "bg-[#212942]/50"}
+          ${selectedUsers?._id === user._id && "bg-[#212942]/50"}
           `}
           >
             <img
@@ -74,19 +94,19 @@ const Sidebar = ({ selectedUser, setSelectedUser }) => {
               className="w-[35px] aspect-[1/1] rounded-full"
             />
             <div className="flex flex-col leading-5">
-              <p>{user.name}</p>
-              {index < 3 ? (
+              <p>{user.fullName}</p>
+              {onlineUsers.includes(user._id) ? (
                 <span className="text-green-400 text-xs">Online</span>
               ) : (
                 <span className="text-neutral-400 text-xs">Offline</span>
               )}
             </div>
-            {index > 2 && (
+            {unseenMessages[user._id] > 0 && (
               <p
                 className="
           absolute top-4 right-4 text-xs h-5 w-5 flex justify-center items-center rounded-full bg-[#3f8cb0]"
               >
-                {index}
+                {unseenMessages[user._id]}
               </p>
             )}
           </div>
