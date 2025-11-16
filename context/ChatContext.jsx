@@ -94,7 +94,8 @@ const sendMessages = async (messageData) => {
     setSelectedUser,
     unseenMessages,
     setUnseenMessages,
-    getMessages
+    getMessages,
+    setMessages
   };
 
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
