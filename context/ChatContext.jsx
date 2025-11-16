@@ -38,21 +38,22 @@ const ChatProvider = ({ children }) => {
   };
 
   //Function to send message to selected user
-  const sendMessages = async (messageData) => {
-    try {
-      const { data } = await axios.get(
-        `api/messages/send/${selectedUser._id}`,
-        messageData
-      );
-      if (data.success) {
-        setMessages((prevMessages) => [...prevMessages, data.newMessage]);
-      } else {
-        toast.error(error.message);
-      }
-    } catch (error) {
-      toast.error(error.message);
+const sendMessages = async (messageData) => {
+  try {
+    const { data } = await axios.post(
+      `/api/messages/send/${selectedUser._id}`,
+      messageData
+    );
+
+    if (data.success) {
+      setMessages((prevMessages) => [...prevMessages, data.newMessage]);
+    } else {
+      toast.error(data.message || "Message sending failed");
     }
-  };
+  } catch (error) {
+    toast.error(error.message);
+  }
+};
 
   //Function to send message to selected user
   const subscribeToMessages = async () => {
@@ -88,12 +89,13 @@ const ChatProvider = ({ children }) => {
     messages,
     users,
     selectedUser,
-    setMessages,
     sendMessages,
     getUsers,
     setSelectedUser,
     unseenMessages,
     setUnseenMessages,
+    getMessages,
+    setMessages
   };
 
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
