@@ -8,8 +8,8 @@ const Sidebar = () => {
   const {
     getUsers,
     users,
-    selectedUsers,
-    setSelectedUsers,
+    selectedUser,
+    setSelectedUser,
     unseenMessages,
     setUnseenMessages,
   } = useContext(ChatContext);
@@ -30,7 +30,7 @@ const Sidebar = () => {
   return (
     <div
       className={`bg-[#8185B2]/10 h-full p-5 rounded-l-xl overflow-y-scroll text-white
-    ${selectedUsers ? "max-md:hidden" : ""}
+    ${selectedUser ? "max-md:hidden" : ""}
     `}
     >
       <div className="pb-5">
@@ -82,10 +82,13 @@ const Sidebar = () => {
       <div className="flex flex-col">
         {filteredUsers.map((user, index) => (
           <div
-            onClick={() => setSelectedUsers(user)}
+            onClick={() => {
+              setSelectedUser(user);
+              setUnseenMessages((prev) => ({ ...prev, [user._id]: 0 }));
+            }}
             key={index}
             className={`relative flex items-center gap-2 p-2 pl-4 rounded cursor-pointer max-sm:text-sm
-          ${selectedUsers?._id === user._id && "bg-[#212942]/50"}
+          ${selectedUser?._id === user._id && "bg-[#212942]/50"}
           `}
           >
             <img
