@@ -24,6 +24,7 @@ const ChatContainer = () => {
   const [input, setInput] = useState("");
   const scrollEnd = useRef();
 
+
   // Initialize socket
   useEffect(() => {
     if (authUser) {
@@ -136,7 +137,6 @@ const ChatContainer = () => {
           alt=""
           className="md:hidden max-w-7"
         />
-        <img src={assets.help_icon} alt="" className="max-md:hidden max-w-5 cursor-pointer transition-transform duration-200 hover:scale-110" />
       </div>
 
       {/* Chat messages */}
