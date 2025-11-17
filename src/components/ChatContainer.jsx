@@ -6,12 +6,19 @@ import toast from "react-hot-toast";
 import assets from "../assets/data";
 import { messageTime } from "../lib/utils";
 
+
 // Socket connection
 let socket;
 
 const ChatContainer = () => {
-  const { messages, setMessages, setSelectedUser, selectedUser, sendMessages, getMessages } =
-    useContext(ChatContext);
+  const {
+    messages,
+    setMessages,
+    setSelectedUser,
+    selectedUser,
+    sendMessages,
+    getMessages,
+  } = useContext(ChatContext);
   const { authUser, onlineUsers } = useContext(AuthContext);
 
   const [input, setInput] = useState("");
@@ -28,8 +35,8 @@ const ChatContainer = () => {
   useEffect(() => {
     if (!socket) return;
     socket.on("receiveMessage", (message) => {
-      if (selectedUser && message.senderID === selectedUser._id) {
-        setMessages(prev => [...prev, message]);
+      if (selectedUser && message.senderId === selectedUser._id) {
+        setMessages((prev) => [...prev, message]);
       }
     });
 
@@ -57,13 +64,13 @@ const ChatContainer = () => {
 
     const messageData = {
       text: input.trim(),
-      senderID: authUser._id,
+      senderId: authUser._id,
       receiverID: selectedUser._id,
       createdAt: new Date(),
     };
 
     // Optimistic update
-    setMessages(prev => [...prev, messageData]);
+    setMessages((prev) => [...prev, messageData]);
 
     // Send to backend via Socket.IO
     socket.emit("sendMessage", messageData);
@@ -77,18 +84,19 @@ const ChatContainer = () => {
   // Send image
   const handleSendImage = async (e) => {
     const file = e.target.files[0];
-    if (!file || !file.type.startsWith("image/")) return toast.error("Select an image file");
+    if (!file || !file.type.startsWith("image/"))
+      return toast.error("Select an image file");
 
     const reader = new FileReader();
     reader.onloadend = async () => {
       const messageData = {
         image: reader.result,
-        senderID: authUser._id,
+        senderId: authUser._id,
         receiverID: selectedUser._id,
         createdAt: new Date(),
       };
 
-      setMessages(prev => [...prev, messageData]);
+      setMessages((prev) => [...prev, messageData]);
       socket.emit("sendMessage", messageData);
       await sendMessages({ image: reader.result });
       e.target.value = "";
@@ -100,7 +108,9 @@ const ChatContainer = () => {
     return (
       <div className="flex flex-col items-center justify-center gap-2 text-gray-500 bg-white/10 max-md:hidden">
         <img src={assets.logo_icon} alt="" className="max-w-16" />
-        <p className="text-lg font-medium text-white">Chat anytime, anywhere!</p>
+        <p className="text-lg font-medium text-white">
+          Chat anytime, anywhere!
+        </p>
       </div>
     );
   }
@@ -109,38 +119,94 @@ const ChatContainer = () => {
     <div className="h-full overflow-scroll relative backdrop-blur-lg">
       {/* Header */}
       <div className="flex items-center gap-3 py-3 mx-4 border-b border-stone-500">
-        <img src={selectedUser?.profilePic || assets.avatar_icon} alt="" className="w-8 rounded-full" />
+        <img
+          src={selectedUser?.profilePic || assets.avatar_icon}
+          alt=""
+          className="w-8 rounded-full"
+        />
         <p className="flex-1 text-lg text-white flex items-center gap-2">
           {selectedUser.fullName}
-          {onlineUsers.includes(selectedUser._id) && <span className="inline-block w-2 h-2 rounded-full bg-green-500"></span>}
+          {onlineUsers.includes(selectedUser._id) && (
+            <span className="inline-block w-2 h-2 rounded-full bg-green-500"></span>
+          )}
         </p>
-        <img onClick={() => setSelectedUser(null)} src={assets.arrow_icon} alt="" className="md:hidden max-w-7" />
-        <img src={assets.help_icon} alt="" className="max-md:hidden max-w-5" />
+        <img
+          onClick={() => setSelectedUser(null)}
+          src={assets.arrow_icon}
+          alt=""
+          className="md:hidden max-w-7"
+        />
+        <img src={assets.help_icon} alt="" className="max-md:hidden max-w-5 cursor-pointer transition-transform duration-200 hover:scale-110" />
       </div>
 
       {/* Chat messages */}
-      <div className="flex flex-col gap-2 h-[calc(100%-120px)] overflow-y-scroll p-5 pb-6">
-        {messages.map((message, idx) => (
-          <div key={idx} className={`flex items-end gap-2 ${message.senderID === authUser._id ? "justify-end" : "flex-row-reverse"}`}>
-            {message.image ? (
-              <img src={message.image} alt="" className="max-w-[230px] border border-gray-700 rounded-lg mb-8" />
-            ) : (
-              <p className={`p-2 max-w-[200px] md:text-sm font-light rounded-lg mb-8 bg-[#212942] text-white ${message.senderID === authUser._id ? "rounded-br-none" : "rounded-bl-none"}`}>
-                {message.text}
-              </p>
-            )}
-            <div className="text-center text-xs">
+     <div className="flex flex-col gap-2 h-[calc(100%-120px)] overflow-y-scroll p-5 pb-6">
+  {authUser && messages.map((message, idx) => {
+    const isSender = message.senderId === authUser._id;
+
+    return (
+      <div
+        key={idx}
+        style={{
+          display: "flex",
+          justifyContent: isSender ? "flex-end" : "flex-start",
+        }}
+      >
+        <div style={{ display: "flex", flexDirection: "column", alignItems: isSender ? "flex-end" : "flex-start" }}>
+          {/* Message bubble */}
+          <div
+            style={{
+              position: "relative",
+              padding: "8px",
+              borderRadius: "12px",
+              backgroundColor: "#332142",
+              color: "white",
+              marginLeft: isSender ? "8px" : "0px",
+              marginRight: isSender ? "0px" : "8px",
+              maxWidth: "230px",
+              wordBreak: "break-word",
+            }}
+          >
+            {message.text || (
               <img
-                src={message.senderID === authUser._id ? selectedUser?.profilePic || assets.avatar_icon : authUser?.profilePic || assets.avatar_icon}
+                src={message.image}
                 alt=""
-                className="w-7 rounded-full"
+                style={{
+                  borderRadius: "12px",
+                  border: "1px solid #333",
+                }}
               />
-              <p className="text-gray-500 mt-1">{messageTime(message.createdAt)}</p>
-            </div>
+            )}
+
+            {/* Quyruq */}
+            <span
+              style={{
+                content: '""',
+                position: "absolute",
+                width: 0,
+                height: 0,
+                borderStyle: "solid",
+                borderWidth: isSender ? "6px 0 6px 6px" : "6px 6px 6px 0",
+                borderColor: isSender ? `transparent transparent transparent #332142` : `transparent #332142 transparent transparent`,
+                top: "8px",
+                right: isSender ? "-6px" : "auto",
+                left: isSender ? "auto" : "-6px",
+              }}
+            ></span>
           </div>
-        ))}
-        <div ref={scrollEnd}></div>
+
+          {/* Time under the bubble */}
+          <p style={{ color: "#999", fontSize: "12px", marginTop: "4px" }}>
+            {messageTime(message.createdAt)}
+          </p>
+        </div>
       </div>
+    );
+  })}
+
+  <div ref={scrollEnd}></div>
+</div>
+
 
       {/* Input area */}
       <div className="absolute bottom-0 left-0 right-0 flex items-center gap-3 p-3">
@@ -153,12 +219,27 @@ const ChatContainer = () => {
             placeholder="Send a message"
             className="flex-1 text-sm p-3 border-none rounded-lg outline-none text-white placeholder-gray-400"
           />
-          <input onChange={handleSendImage} type="file" id="image" accept="image/png, image/jpeg" hidden />
+          <input
+            onChange={handleSendImage}
+            type="file"
+            id="image"
+            accept="image/png, image/jpeg"
+            hidden
+          />
           <label htmlFor="image">
-            <img src={assets.gallery_icon} alt="" className="w-5 mr-2 cursor-pointer" />
+            <img
+              src={assets.gallery_icon}
+              alt=""
+              className="w-5 mr-2 cursor-pointer"
+            />
           </label>
         </div>
-        <img src={assets.send_button} alt="" className="w-7 cursor-pointer" onClick={handleSendMessage} />
+        <img
+          src={assets.send_button}
+          alt=""
+          className="w-7 cursor-pointer transition-transform duration-200 hover:scale-110"
+          onClick={handleSendMessage}
+        />
       </div>
     </div>
   );

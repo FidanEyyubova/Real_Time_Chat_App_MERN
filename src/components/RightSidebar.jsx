@@ -50,9 +50,12 @@ const RightSidebar = () => {
           </div>
         </div>
         <button onClick={() => logout()}
-          className="absolute bottom-5 left-1/2 transform -translate-x-1/2 bg-gradient-to-r from-cyan-400 to-blue-800 text-white font-medium
-      border-none text-sm  py-2 px-20 rounded-full cursor-pointer
+          className="absolute bottom-5 left-1/2 transform -translate-x-1/2  text-white font-medium
+      border-none text-sm  py-2 px-20 rounded-full cursor-pointer transition-transform duration-200 hover:scale-105
       "
+       style={{
+    background: "linear-gradient(90deg, rgba(121, 9, 24, 1) 0%, rgba(88, 14, 138, 1) 100%)"
+  }}
         >
           Logout
         </button>
