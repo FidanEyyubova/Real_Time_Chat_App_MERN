@@ -2,6 +2,7 @@ import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
 import assets from "../assets/data";
 import { AuthContext } from "../../context/AuthContext";
+import 'animate.css';
 
 const ProfilePage = () => {
   const { authUser, updateProfile } = useContext(AuthContext);
@@ -36,7 +37,7 @@ const ProfilePage = () => {
   };
 
   return (
-    <div className="min-h-screen bg-cover bg-no-repeat flex items-center justify-center">
+    <div className="min-h-screen backdrop-blur-2xl bg-cover bg-no-repeat flex items-center justify-center animate__animated animate__fadeIn">
       <div
         className="w-5/6 max-w-2xl backdrop-blur-2xl text-gray-300 border-2 border-gray-600
       flex items-center justify-between max-sm:flex-col-reverse rounded-lg
@@ -44,7 +45,7 @@ const ProfilePage = () => {
       >
         <form
           onSubmit={handleSubmit}
-          className="flex flex-col gap-7 p-10 flex-1"
+          className="flex flex-col gap-7 p-10 flex-1 "
         >
           <h3 className="text-lg">Profile Details</h3>
           <label
@@ -87,7 +88,10 @@ const ProfilePage = () => {
           ></textarea>
           <button
             type="submit"
-            className="py-3 bg-gradient-to-r from-cyan-400 to-blue-800 text-white font-medium rounded-md cursor-pointer"
+            className="py-3  text-white font-medium rounded-md cursor-pointer transition-transform duration-200 hover:scale-105"
+            style={{
+    background: "linear-gradient(90deg, rgba(121, 9, 24, 1) 0%, rgba(88, 14, 138, 1) 100%)"
+  }}
           >
             Save
           </button>

@@ -48,7 +48,7 @@ const Sidebar = () => {
               alt="Menu-bar"
               className="max-h-5 cursor-pointer"
             />
-            <div className="absolute top-full right-0 z-20 w-32 p-5 rounded-md bg-[#212942] border border-gray-600 text-gray-100 
+            <div className="absolute top-full right-0 z-20 w-32 p-5 rounded-md bg-[#332142] border border-gray-600 text-gray-100 
                opacity-0 scale-95 pointer-events-none group-hover:opacity-100 group-hover:scale-100 group-hover:pointer-events-auto 
                transition-all duration-200 ease-out origin-top-right">
               <p
@@ -68,7 +68,7 @@ const Sidebar = () => {
           </div>
         </div>
 
-        <div className="bg-[#212942] rounded-full flex items-center gap-2 py-3 px-4 mt-5">
+        <div className="bg-[#332142] rounded-full flex items-center gap-2 py-3 px-4 mt-5">
           <img src={assets.search_icon} alt="Search" className="w-3" />
           <input
             value={searchInput}
@@ -88,12 +88,12 @@ const Sidebar = () => {
               setSelectedUser(user);
               setUnseenMessages((prev) => ({ ...prev, [user._id]: 0 }));
             }}
-            className={`relative flex items-center gap-2 p-2 pl-4 rounded cursor-pointer max-sm:text-sm ${
-              selectedUser?._id === user._id && "bg-[#212942]/50"
+            className={`relative flex items-center gap-2 p-3 pl-4 rounded  transition-transform duration-200 hover:bg-[#332142]/50 cursor-pointer max-sm:text-sm ${
+              selectedUser?._id === user._id && "bg-[#332142]/50"
             }`}
           >
             <img
-              src={user.profilePic}
+              src={user?.profilePic || assets.avatar_icon}
               alt={user.fullName}
               className="w-[35px] aspect-square rounded-full"
             />
