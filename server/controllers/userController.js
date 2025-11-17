@@ -4,7 +4,6 @@ import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 
 //! Signup a new user
-
 export const signup = async (req, res) => {
   const { fullName, email, password, bio } = req.body;
   try {
@@ -31,7 +30,7 @@ export const signup = async (req, res) => {
       success: true,
       userData: newUser,
       token,
-      message: "Account created succesfully!",
+      message: "Account created successfully!",
     });
   } catch (error) {
     console.log(error.message);
@@ -40,14 +39,15 @@ export const signup = async (req, res) => {
 };
 
 //! Signin a user
-
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
     const userData = await User.findOne({ email });
+    if (!userData) {
+      return res.json({ success: false, message: "User not found" });
+    }
 
     const isPasswordCorrect = await bcrypt.compare(password, userData.password);
-
     if (!isPasswordCorrect) {
       return res.json({ success: false, message: "Invalid credentials" });
     }
@@ -58,7 +58,7 @@ export const login = async (req, res) => {
       success: true,
       userData,
       token,
-      message: "Login succesful!",
+      message: "Login successful!",
     });
   } catch (error) {
     console.log(error.message);
@@ -66,40 +66,45 @@ export const login = async (req, res) => {
   }
 };
 
-//!Control if user is authenticated
-
+//! Control if user is authenticated
 export const checkAuth = (req, res) => {
   res.json({ success: true, user: req.user });
 };
 
-//!Controller to update user profile details
+//! Update user profile (without deleting profile image)
 export const updateProfile = async (req, res) => {
   try {
     const { profilePic, fullName, bio } = req.body;
     const userID = req.user._id;
-    let updatedUser;
 
-    if (!profilePic) {
-      updatedUser = await User.findByIdAndUpdate(
-        userID,
-        { fullName, bio },
-        { new: true }
-      );
-    } else {
-      const upload = await cloudinary.uploader.upload(profilePic);
-      updatedUser = await User.findByIdAndUpdate(
-        userID,
-        {
-          profilePic: upload.secure_url,
-          bio,
-          fullName,
-        },
-        { new: true }
-      );
-    }
+    const updatedUser = await User.findByIdAndUpdate(
+      userID,
+      { profilePic, fullName, bio },
+      { new: true }
+    );
+
     res.json({ success: true, user: updatedUser });
   } catch (error) {
-    console.log(error.message)
+    console.log(error.message);
+    res.json({ success: false, message: error.message });
+  }
+};
+
+//! Delete a user account
+export const deleteUser = async (req, res) => {
+  try {
+    const userID = req.user._id;
+    const user = await User.findById(userID);
+
+    if (!user) {
+      return res.json({ success: false, message: "User not found" });
+    }
+
+    await User.findByIdAndDelete(userID);
+
+    res.json({ success: true, message: "User account deleted successfully" });
+  } catch (error) {
+    console.log(error.message);
     res.json({ success: false, message: error.message });
   }
 };
