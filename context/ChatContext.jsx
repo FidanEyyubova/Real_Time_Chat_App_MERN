@@ -12,7 +12,9 @@ const ChatProvider = ({ children }) => {
 
   const { socket, axios } = useContext(AuthContext);
 
-  //Function to get all users for sidebar
+  // ---------------------------
+  // GET USERS FOR SIDEBAR
+  // ---------------------------
   const getUsers = async () => {
     try {
       const { data } = await axios.get("api/messages/users");
@@ -25,66 +27,93 @@ const ChatProvider = ({ children }) => {
     }
   };
 
-  //Function to get all messages for selected user
+  // ---------------------------
+  // GET MESSAGES FOR SELECTED USER
+  // ---------------------------
   const getMessages = async (userId) => {
     try {
       const { data } = await axios.get(`api/messages/${userId}`);
       if (data.success) {
         setMessages(data.messages);
+
+        // Reset unseen count for this user
+        setUnseenMessages((prev) => ({
+          ...prev,
+          [userId]: 0,
+        }));
       }
     } catch (error) {
       toast.error(error.message);
     }
   };
 
-  //Function to send message to selected user
-const sendMessages = async (messageData) => {
-  try {
-    const { data } = await axios.post(
-      `/api/messages/send/${selectedUser._id}`,
-      messageData
-    );
+  // ---------------------------
+  // SEND MESSAGE
+  // ---------------------------
+  const sendMessages = async (messageData) => {
+    try {
+      const { data } = await axios.post(
+        `/api/messages/send/${selectedUser._id}`,
+        messageData
+      );
 
-    if (data.success) {
-      setMessages((prevMessages) => [...prevMessages, data.newMessage]);
-    } else {
-      toast.error(data.message || "Message sending failed");
+      if (data.success) {
+        setMessages((prev) => [...prev, data.newMessage]);
+      } else {
+        toast.error(data.message || "Message sending failed");
+      }
+    } catch (error) {
+      toast.error(error.message);
     }
-  } catch (error) {
-    toast.error(error.message);
-  }
-};
+  };
 
-  //Function to send message to selected user
-  const subscribeToMessages = async () => {
+  // ---------------------------
+  // REAL-TIME SOCKET LISTENERS
+  // ---------------------------
+  useEffect(() => {
     if (!socket) return;
 
-    socket.on("newMessage", (newMessage) => {
+    // ---------------------
+    // 1. NEW MESSAGE EVENT
+    // ---------------------
+    const handleNewMessage = (newMessage) => {
+      // If this message is from opened chat user
       if (selectedUser && newMessage.senderId === selectedUser._id) {
         newMessage.seen = true;
-        setMessages((prevMessages) => [...prevMessages, newMessage]);
+        setMessages((prev) => [...prev, newMessage]);
         axios.put(`/api/messages/mark/${newMessage._id}`);
       } else {
-        setUnseenMessages((prevUnseenMessages) => ({
-          ...prevUnseenMessages,
-          [newMessage.senderId]: prevUnseenMessages[newMessage.senderId]
-            ? prevUnseenMessages[newMessage.senderId] + 1
-            : 1,
+        // If chat is not opened → increment unseen
+        setUnseenMessages((prev) => ({
+          ...prev,
+          [newMessage.senderId]: (prev[newMessage.senderId] || 0) + 1,
         }));
       }
-    });
-  };
+    };
 
-  //Function to unsubscribe from messages
-  const unsubscribeFromMessages = () => {
-    if (socket) socket.off("newMessage");
-  };
+    // ---------------------
+    // 2. UNSEEN MESSAGE EVENT
+    // ---------------------
+    const handleUnseenMessage = ({ senderId }) => {
+      if (!selectedUser || selectedUser._id !== senderId) {
+        setUnseenMessages((prev) => ({
+          ...prev,
+          [senderId]: (prev[senderId] || 0) + 1,
+        }));
+      }
+    };
 
-  useEffect(() => {
-    subscribeToMessages();
-    return () => unsubscribeFromMessages();
+    socket.on("newMessage", handleNewMessage);
+    socket.on("unseenMessage", handleUnseenMessage);
+
+    // Cleanup
+    return () => {
+      socket.off("newMessage", handleNewMessage);
+      socket.off("unseenMessage", handleUnseenMessage);
+    };
   }, [socket, selectedUser]);
 
+  // ---------------------------
   const value = {
     messages,
     users,
@@ -95,7 +124,7 @@ const sendMessages = async (messageData) => {
     unseenMessages,
     setUnseenMessages,
     getMessages,
-    setMessages
+    setMessages,
   };
 
   return <ChatContext.Provider value={value}>{children}</ChatContext.Provider>;
