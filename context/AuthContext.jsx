@@ -14,7 +14,6 @@ const AuthProvider = ({ children }) => {
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [socket, setSocket] = useState(null);
 
-  // Check if user is authenticated and set user + socket
   const checkAuth = async () => {
     try {
       const { data } = await axios.get("/api/auth/check");
@@ -27,7 +26,7 @@ const AuthProvider = ({ children }) => {
     }
   };
 
-  // Login
+  //Login section
   const login = async (state, credentials) => {
     try {
       const { data } = await axios.post(`/api/auth/${state}`, credentials);
@@ -46,23 +45,21 @@ const AuthProvider = ({ children }) => {
     }
   };
 
-  // Logout
-  // Logout
-const logout = async (showToast = true) => {
-  localStorage.removeItem("token");
-  setToken(null);
-  setAuthUser(null);
-  setOnlineUsers([]);
-  axios.defaults.headers.common["token"] = null;
-  if (socket) socket.disconnect();
-  
-  if (showToast) {
-    toast.success("Logged out successfully");
-  }
-};
+  //Logout section
+  const logout = async (showToast = true) => {
+    localStorage.removeItem("token");
+    setToken(null);
+    setAuthUser(null);
+    setOnlineUsers([]);
+    axios.defaults.headers.common["token"] = null;
+    if (socket) socket.disconnect();
 
+    if (showToast) {
+      toast.success("Logged out successfully");
+    }
+  };
 
-  // Update profile
+  //Update section
   const updateProfile = async (body) => {
     try {
       const { data } = await axios.put("/api/auth/update-profile", body);
@@ -75,10 +72,12 @@ const logout = async (showToast = true) => {
     }
   };
 
-  // Delete profile image
+  //Delete profile image section
   const deleteProfileImage = async () => {
     try {
-      const { data } = await axios.put("/api/auth/update-profile", { profilePic: null });
+      const { data } = await axios.put("/api/auth/update-profile", {
+        profilePic: null,
+      });
       if (data.success) {
         setAuthUser(data.user);
         toast.success("Profile image deleted successfully");
@@ -88,29 +87,25 @@ const logout = async (showToast = true) => {
     }
   };
 
-  // Delete user account
- // AuthContext.js
-const deleteUser = async () => {
-  try {
-    const { data } = await axios.delete("/api/auth/delete-user", {
-      headers: { token: localStorage.getItem("token") },
-    });
+  //Delete user account section
+  const deleteUser = async () => {
+    try {
+      const { data } = await axios.delete("/api/auth/delete-user", {
+        headers: { token: localStorage.getItem("token") },
+      });
 
-    if (data.success) {
-      toast.success(data.message); // Only show account deleted message
-      logout(false); // Silent logout, no toast
-    } else {
-      toast.error(data.message);
+      if (data.success) {
+        toast.success(data.message);
+        logout(false);
+      } else {
+        toast.error(data.message);
+      }
+    } catch (error) {
+      toast.error(error.response?.data?.message || error.message);
     }
-  } catch (error) {
-    toast.error(error.response?.data?.message || error.message);
-  }
-};
+  };
 
-
-
-
-  // Connect socket
+  //Connect socket section
   const connectSocket = (userData) => {
     if (!userData || socket?.connected) return;
     const newSocket = io(backendUrl, {

@@ -1,13 +1,11 @@
-import React, { useContext, useEffect, useRef, useState } from "react";
+import { useContext, useEffect, useRef, useState } from "react";
 import { ChatContext } from "../../context/ChatContext";
 import { AuthContext } from "../../context/AuthContext";
 import { io } from "socket.io-client";
 import toast from "react-hot-toast";
-import assets from "../assets/data";
 import { messageTime } from "../lib/utils";
+import assets from "../assets/data";
 
-
-// Socket connection
 let socket;
 
 const ChatContainer = () => {
@@ -24,15 +22,12 @@ const ChatContainer = () => {
   const [input, setInput] = useState("");
   const scrollEnd = useRef();
 
-
-  // Initialize socket
   useEffect(() => {
     if (authUser) {
       socket = io("http://localhost:5000", { query: { userId: authUser._id } });
     }
   }, [authUser]);
 
-  // Receive real-time messages
   useEffect(() => {
     if (!socket) return;
     socket.on("receiveMessage", (message) => {
@@ -44,21 +39,18 @@ const ChatContainer = () => {
     return () => socket.off("receiveMessage");
   }, [selectedUser, setMessages]);
 
-  // Get messages when selecting user
   useEffect(() => {
     if (selectedUser) {
       getMessages(selectedUser._id);
     }
   }, [selectedUser, getMessages]);
 
-  // Scroll to end
   useEffect(() => {
     if (scrollEnd.current && messages) {
       scrollEnd.current.scrollIntoView({ behavior: "smooth" });
     }
   }, [messages]);
 
-  // Send message
   const handleSendMessage = async (e) => {
     e.preventDefault();
     if (!input.trim()) return;
@@ -70,19 +62,12 @@ const ChatContainer = () => {
       createdAt: new Date(),
     };
 
-    // Optimistic update
     setMessages((prev) => [...prev, messageData]);
-
-    // Send to backend via Socket.IO
     socket.emit("sendMessage", messageData);
-
-    // Save to DB
     await sendMessages({ text: input.trim() });
-
     setInput("");
   };
 
-  // Send image
   const handleSendImage = async (e) => {
     const file = e.target.files[0];
     if (!file || !file.type.startsWith("image/"))
@@ -118,7 +103,6 @@ const ChatContainer = () => {
 
   return (
     <div className="h-full overflow-scroll relative backdrop-blur-lg">
-      {/* Header */}
       <div className="flex items-center gap-3 py-3 mx-4 border-b border-stone-500">
         <img
           src={selectedUser?.profilePic || assets.avatar_icon}
@@ -139,76 +123,68 @@ const ChatContainer = () => {
         />
       </div>
 
-      {/* Chat messages */}
-     <div className="flex flex-col gap-2 h-[calc(100%-120px)] overflow-y-scroll p-5 pb-6">
-  {authUser && messages.map((message, idx) => {
-    const isSender = message.senderId === authUser._id;
+      <div className="flex flex-col gap-2 h-[calc(100%-120px)] overflow-y-scroll p-5 pb-6">
+        {authUser &&
+          messages.map((message, idx) => {
+            const isSender = message.senderId === authUser._id;
 
-    return (
-      <div
-        key={idx}
-        style={{
-          display: "flex",
-          justifyContent: isSender ? "flex-end" : "flex-start",
-        }}
-      >
-        <div style={{ display: "flex", flexDirection: "column", alignItems: isSender ? "flex-end" : "flex-start" }}>
-          {/* Message bubble */}
-          <div
-            style={{
-              position: "relative",
-              padding: "8px",
-              borderRadius: "12px",
-              backgroundColor: isSender ? "#6d0a41" : "#332142",
-              color: "white",
-              marginLeft: isSender ? "8px" : "0px",
-              marginRight: isSender ? "0px" : "8px",
-              maxWidth: "230px",
-              wordBreak: "break-word",
-            }}
-          >
-            {message.text || (
-              <img
-                src={message.image}
-                alt=""
+            return (
+              <div
+                key={idx}
                 style={{
-                  borderRadius: "12px",
-                  border: "1px solid #333",
+                  display: "flex",
+                  justifyContent: isSender ? "flex-end" : "flex-start",
                 }}
-              />
-            )}
+              >
+                <div
+                  style={{
+                    display: "flex",
+                    flexDirection: "column",
+                    alignItems: isSender ? "flex-end" : "flex-start",
+                  }}
+                >
+                  <div
+                    className={`relative p-2 rounded-xl text-white break-words max-w-[230px] 
+    ${isSender ? "bg-[#6d0a41] ml-2 mr-0" : "bg-[#332142] ml-0 mr-2"}
+  `}
+                  >
+                    {message.text || (
+                      <img
+                        src={message.image}
+                        alt=""
+                        className="rounded-xl border border-[#333]"
+                      />
+                    )}
 
-            {/* Quyruq */}
-            <span
-              style={{
-                content: '""',
-                position: "absolute",
-                width: 0,
-                height: 0,
-                borderStyle: "solid",
-                borderWidth: isSender ? "6px 0 6px 6px" : "6px 6px 6px 0",
-                borderColor: isSender ? `transparent transparent transparent #6d0a41` : `transparent #332142 transparent transparent`,
-                top: "8px",
-                right: isSender ? "-6px" : "auto",
-                left: isSender ? "auto" : "-6px",
-              }}
-            ></span>
-          </div>
+                    <span
+                      className={`
+      absolute w-0 h-0 top-2
+      ${
+        isSender
+          ? "right-[-6px] border-t-[6px] border-b-[6px] border-l-[6px] border-t-transparent border-b-transparent border-l-[#6d0a41]"
+          : "left-[-6px] border-t-[6px] border-b-[6px] border-r-[6px] border-t-transparent border-b-transparent border-r-[#332142]"
+      }
+    `}
+                    ></span>
+                  </div>
 
-          {/* Time under the bubble */}
-          <p style={{ color: "#999", fontSize: "12px", marginTop: "4px" }}>
-            {messageTime(message.createdAt)}
-          </p>
-        </div>
+                  <p
+                    style={{
+                      color: "#999",
+                      fontSize: "12px",
+                      marginTop: "4px",
+                    }}
+                  >
+                    {messageTime(message.createdAt)}
+                  </p>
+                </div>
+              </div>
+            );
+          })}
+
+        <div ref={scrollEnd}></div>
       </div>
-    );
-  })}
 
-  <div ref={scrollEnd}></div>
-</div>
-
-
-      {/* Input area */}
       <div className="absolute bottom-0 left-0 right-0 flex items-center gap-3 p-3">
         <div className="flex-1 flex items-center bg-gray-100/12 px-3 rounded-full">
           <input

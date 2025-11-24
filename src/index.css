@@ -1,9 +1,9 @@
 @import "tailwindcss";
 
-::-webkit-scrollbar{
+::-webkit-scrollbar {
   display: none;
 }
 
-*{
+* {
   font-family: "Ubuntu", sans-serif;
 }

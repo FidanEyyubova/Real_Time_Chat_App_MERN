@@ -3,7 +3,6 @@ import { useNavigate } from "react-router-dom";
 import assets from "../assets/data";
 import { AuthContext } from "../../context/AuthContext";
 import 'animate.css';
-import Swal from "sweetalert2";
 import toast from "react-hot-toast";
 
 const ProfilePage = () => {
@@ -55,7 +54,7 @@ const ProfilePage = () => {
               toast.dismiss(t.id);
               try {
                 await deleteUser();
-                navigate("/"); // redirect after deletion
+                navigate("/");
               } catch (err) {
                 toast.error(err.message || "Something went wrong!");
               }
@@ -66,7 +65,7 @@ const ProfilePage = () => {
         </div>
       </div>
     ),
-    { duration: Infinity } // keep it open until user clicks
+    { duration: Infinity }
   );
 };
 
@@ -133,7 +132,6 @@ const ProfilePage = () => {
             Save
           </button>
 
-          {/* Delete account */}
           <button
             type="button"
             onClick={handleDeleteAccount}
