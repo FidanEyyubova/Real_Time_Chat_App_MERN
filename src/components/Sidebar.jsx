@@ -107,7 +107,7 @@ const Sidebar = () => {
             </div>
 
             {unseenMessages[user._id] > 0 && (
-              <p className="absolute top-4 right-4 text-xs h-5 w-5 flex justify-center items-center rounded-full bg-[#3f8cb0]">
+              <p className="absolute top-4 right-4 text-xs h-5 w-5 flex justify-center items-center rounded-full bg-[#6d0a41]">
                 {unseenMessages[user._id]}
               </p>
             )}

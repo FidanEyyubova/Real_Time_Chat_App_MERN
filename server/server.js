@@ -22,7 +22,7 @@ export const io = new Server(server, {
 export const userSocketMap = {};
 
 // Middleware
-app.use(express.json({ limit: "4mb" }));
+app.use(express.json({ limit: "10mb" }));
 app.use(cors());
 
 // Routes
