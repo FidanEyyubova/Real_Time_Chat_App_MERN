@@ -14,69 +14,52 @@ const AuthProvider = ({ children }) => {
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [socket, setSocket] = useState(null);
 
-  useEffect(() => {
-    const storedToken = localStorage.getItem("token");
-    if (storedToken) {
-      setToken(storedToken);
-      axios.defaults.headers.common["Authorization"] = `Bearer ${storedToken}`;
-      checkAuth(storedToken);
-    }
-  }, []);
-
-  const checkAuth = async (currentToken) => {
+  const checkAuth = async () => {
     try {
-      const { data } = await axios.get("/api/auth/check", {
-        headers: {
-          Authorization: `Bearer ${currentToken}`,
-        },
-      });
-
+      const { data } = await axios.get("/api/auth/check");
       if (data.success) {
         setAuthUser(data.user);
         connectSocket(data.user);
-      } else {
-        logout(false);
       }
     } catch (error) {
-      logout(false);
+      toast.error(error.message);
     }
   };
 
-  // Login
+  //Login section
   const login = async (state, credentials) => {
     try {
       const { data } = await axios.post(`/api/auth/${state}`, credentials);
-
       if (data.success) {
         setAuthUser(data.userData);
+        connectSocket(data.userData);
+        axios.defaults.headers.common["token"] = data.token;
         setToken(data.token);
         localStorage.setItem("token", data.token);
-
-        axios.defaults.headers.common["Authorization"] = `Bearer ${data.token}`;
-        connectSocket(data.userData);
         toast.success(data.message);
       } else {
         toast.error(data.message);
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || error.message);
+      toast.error(error.message);
     }
   };
 
-  // Logout
-  const logout = (showToast = true) => {
+  //Logout section
+  const logout = async (showToast = true) => {
     localStorage.removeItem("token");
     setToken(null);
     setAuthUser(null);
     setOnlineUsers([]);
-    delete axios.defaults.headers.common["Authorization"];
-
+    axios.defaults.headers.common["token"] = null;
     if (socket) socket.disconnect();
 
-    if (showToast) toast.success("Logged out successfully");
+    if (showToast) {
+      toast.success("Logged out successfully");
+    }
   };
 
-  // Update profile
+  //Update section
   const updateProfile = async (body) => {
     try {
       const { data } = await axios.put("/api/auth/update-profile", body);
@@ -85,11 +68,11 @@ const AuthProvider = ({ children }) => {
         toast.success("Profile updated successfully");
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || error.message);
+      toast.error(error.message);
     }
   };
 
-  // Delete profile image
+  //Delete profile image section
   const deleteProfileImage = async () => {
     try {
       const { data } = await axios.put("/api/auth/update-profile", {
@@ -100,14 +83,17 @@ const AuthProvider = ({ children }) => {
         toast.success("Profile image deleted successfully");
       }
     } catch (error) {
-      toast.error(error.response?.data?.message || error.message);
+      toast.error(error.message);
     }
   };
 
-  // Delete user
+  //Delete user account section
   const deleteUser = async () => {
     try {
-      const { data } = await axios.delete("/api/auth/delete-user");
+      const { data } = await axios.delete("/api/auth/delete-user", {
+        headers: { token: localStorage.getItem("token") },
+      });
+
       if (data.success) {
         toast.success(data.message);
         logout(false);
@@ -119,14 +105,14 @@ const AuthProvider = ({ children }) => {
     }
   };
 
-  // Connect socket
+  //Connect socket section
   const connectSocket = (userData) => {
     if (!userData || socket?.connected) return;
-
     const newSocket = io(backendUrl, {
-      query: { userId: userData._id },
+      query: {
+        userId: userData._id,
+      },
     });
-
     newSocket.connect();
     setSocket(newSocket);
 
@@ -134,6 +120,13 @@ const AuthProvider = ({ children }) => {
       setOnlineUsers(userIds);
     });
   };
+
+  useEffect(() => {
+    if (token) {
+      axios.defaults.headers.common["token"] = token;
+    }
+    checkAuth();
+  }, []);
 
   const value = {
     axios,
