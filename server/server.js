@@ -9,28 +9,40 @@ import { Server } from "socket.io";
 import Message from "./models/Message.js";
 import User from "./models/User.js";
 
-// Express & HTTP server
 const app = express();
 const server = http.createServer(app);
 
-// Socket.IO server
-export const io = new Server(server, {
-  cors: { origin: "*" },
-});
+const allowedOrigins = [
+  "http://localhost:5173",
+  "https://real-time-chat-app-mern-ruddy.vercel.app",
+];
 
-// Store online users
-export const userSocketMap = {};
+app.use(cors({
+  origin: function(origin, callback) {
+    if (!origin) return callback(null, true); 
+    if (allowedOrigins.includes(origin)) return callback(null, true);
+    callback(new Error("Not allowed by CORS"));
+  },
+  methods: ["GET", "POST", "PUT", "DELETE"],
+  credentials: true,
+}));
 
-// Middleware
 app.use(express.json({ limit: "10mb" }));
-app.use(cors());
 
-// Routes
-app.use("/api/status", (res) => res.send("Server is live"));
+app.get("/api/status", (req, res) => res.send("Server is live"));
 app.use("/api/auth", userRouter);
 app.use("/api/messages", messageRouter);
 
-// Socket.IO connection
+export const io = new Server(server, {
+  cors: {
+    origin: allowedOrigins,
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
+});
+
+export const userSocketMap = {};
+
 io.on("connection", (socket) => {
   const userId = socket.handshake.query.userId;
   console.log("User Connected:", userId);
@@ -41,7 +53,6 @@ io.on("connection", (socket) => {
   socket.on("sendMessage", async (messageData) => {
     try {
       const newMessage = await Message.create(messageData);
-
       const receiverSocket = userSocketMap[messageData.receiverID];
       if (receiverSocket) {
         io.to(receiverSocket).emit("receiveMessage", newMessage);
@@ -80,10 +91,8 @@ io.on("connection", (socket) => {
 await connectMongoDb();
 
 if (process.env.NODE_ENV !== "production") {
-  
   const PORT = process.env.PORT || 5000;
   server.listen(PORT, () => console.log(`Server running on PORT: ${PORT}`));
 }
 
-export default server
-
+export default server;
