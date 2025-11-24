@@ -1,4 +1,4 @@
-import React, { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useState } from "react";
 import { AuthContext } from "./AuthContext";
 import toast from "react-hot-toast";
 
@@ -12,9 +12,7 @@ const ChatProvider = ({ children }) => {
 
   const { socket, axios } = useContext(AuthContext);
 
-  // ---------------------------
-  // GET USERS FOR SIDEBAR
-  // ---------------------------
+  //Get user section
   const getUsers = async () => {
     try {
       const { data } = await axios.get("api/messages/users");
@@ -27,16 +25,12 @@ const ChatProvider = ({ children }) => {
     }
   };
 
-  // ---------------------------
-  // GET MESSAGES FOR SELECTED USER
-  // ---------------------------
+  //Get messages section
   const getMessages = async (userId) => {
     try {
       const { data } = await axios.get(`api/messages/${userId}`);
       if (data.success) {
         setMessages(data.messages);
-
-        // Reset unseen count for this user
         setUnseenMessages((prev) => ({
           ...prev,
           [userId]: 0,
@@ -47,9 +41,7 @@ const ChatProvider = ({ children }) => {
     }
   };
 
-  // ---------------------------
-  // SEND MESSAGE
-  // ---------------------------
+  //Send message section
   const sendMessages = async (messageData) => {
     try {
       const { data } = await axios.post(
@@ -67,23 +59,15 @@ const ChatProvider = ({ children }) => {
     }
   };
 
-  // ---------------------------
-  // REAL-TIME SOCKET LISTENERS
-  // ---------------------------
+  //New message section
   useEffect(() => {
     if (!socket) return;
-
-    // ---------------------
-    // 1. NEW MESSAGE EVENT
-    // ---------------------
     const handleNewMessage = (newMessage) => {
-      // If this message is from opened chat user
       if (selectedUser && newMessage.senderId === selectedUser._id) {
         newMessage.seen = true;
         setMessages((prev) => [...prev, newMessage]);
         axios.put(`/api/messages/mark/${newMessage._id}`);
       } else {
-        // If chat is not opened → increment unseen
         setUnseenMessages((prev) => ({
           ...prev,
           [newMessage.senderId]: (prev[newMessage.senderId] || 0) + 1,
@@ -91,9 +75,7 @@ const ChatProvider = ({ children }) => {
       }
     };
 
-    // ---------------------
-    // 2. UNSEEN MESSAGE EVENT
-    // ---------------------
+    //Unseenmessages section
     const handleUnseenMessage = ({ senderId }) => {
       if (!selectedUser || selectedUser._id !== senderId) {
         setUnseenMessages((prev) => ({
@@ -106,14 +88,13 @@ const ChatProvider = ({ children }) => {
     socket.on("newMessage", handleNewMessage);
     socket.on("unseenMessage", handleUnseenMessage);
 
-    // Cleanup
+    //Cleanup
     return () => {
       socket.off("newMessage", handleNewMessage);
       socket.off("unseenMessage", handleUnseenMessage);
     };
   }, [socket, selectedUser]);
 
-  // ---------------------------
   const value = {
     messages,
     users,

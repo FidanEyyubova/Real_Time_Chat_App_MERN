@@ -1,5 +1,5 @@
-import React, { useContext, useEffect, useState } from "react";
-import assets, { imagesData } from "../assets/data";
+import { useContext, useEffect, useState } from "react";
+import assets from "../assets/data";
 import { ChatContext } from "../../context/ChatContext";
 import { AuthContext } from "../../context/AuthContext";
 
@@ -8,7 +8,6 @@ const RightSidebar = () => {
   const { logout, onlineUsers } = useContext(AuthContext);
   const [msgImages, setMsgImages] = useState([]);
 
-  // Get all the images from the messages and set them to state
   useEffect(() => {
     setMsgImages(messages.filter((msg) => msg.image).map((msg) => msg.image));
   }, [messages]);

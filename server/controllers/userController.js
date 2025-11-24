@@ -1,9 +1,8 @@
-import cloudinary from "../lib/cloudinary.js";
 import { generateToken } from "../lib/utils.js";
 import User from "../models/User.js";
 import bcrypt from "bcryptjs";
 
-//! Signup a new user
+//Signup a new user
 export const signup = async (req, res) => {
   const { fullName, email, password, bio } = req.body;
   try {
@@ -38,7 +37,7 @@ export const signup = async (req, res) => {
   }
 };
 
-//! Signin a user
+//Signin a user
 export const login = async (req, res) => {
   try {
     const { email, password } = req.body;
@@ -66,12 +65,12 @@ export const login = async (req, res) => {
   }
 };
 
-//! Control if user is authenticated
+//Control if user is authenticated
 export const checkAuth = (req, res) => {
   res.json({ success: true, user: req.user });
 };
 
-//! Update user profile (without deleting profile image)
+//Update user profile (without deleting profile image)
 export const updateProfile = async (req, res) => {
   try {
     const { profilePic, fullName, bio } = req.body;
@@ -90,7 +89,7 @@ export const updateProfile = async (req, res) => {
   }
 };
 
-//! Delete a user account
+//Delete a user account
 export const deleteUser = async (req, res) => {
   try {
     const userID = req.user._id;

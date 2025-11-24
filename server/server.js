@@ -26,7 +26,7 @@ app.use(express.json({ limit: "10mb" }));
 app.use(cors());
 
 // Routes
-app.use("/api/status", (req, res) => res.send("Server is live"));
+app.use("/api/status", (res) => res.send("Server is live"));
 app.use("/api/auth", userRouter);
 app.use("/api/messages", messageRouter);
 
@@ -36,17 +36,12 @@ io.on("connection", (socket) => {
   console.log("User Connected:", userId);
 
   if (userId) userSocketMap[userId] = socket.id;
-
-  // Emit updated online users
   io.emit("getOnlineUsers", Object.keys(userSocketMap));
 
-  // Listen for sendMessage
   socket.on("sendMessage", async (messageData) => {
     try {
-      // Save message to MongoDB
       const newMessage = await Message.create(messageData);
 
-      // Send to receiver if online
       const receiverSocket = userSocketMap[messageData.receiverID];
       if (receiverSocket) {
         io.to(receiverSocket).emit("receiveMessage", newMessage);
@@ -56,7 +51,6 @@ io.on("connection", (socket) => {
     }
   });
 
-  // Listen for deleting user account
   socket.on("deleteUser", async (userID) => {
     try {
       const user = await User.findById(userID);
@@ -64,7 +58,6 @@ io.on("connection", (socket) => {
 
       await User.findByIdAndDelete(userID);
 
-      // Disconnect user socket & update online users
       if (userSocketMap[userID]) {
         io.to(userSocketMap[userID]).disconnect(true);
         delete userSocketMap[userID];
@@ -75,7 +68,6 @@ io.on("connection", (socket) => {
     }
   });
 
-  // Handle disconnect
   socket.on("disconnect", () => {
     console.log("User Disconnected:", userId);
     if (userId && userSocketMap[userId]) {
@@ -85,9 +77,7 @@ io.on("connection", (socket) => {
   });
 });
 
-// Connect MongoDB
 await connectMongoDb();
 
-// Start server
 const PORT = process.env.PORT || 5000;
 server.listen(PORT, () => console.log(`Server running on PORT: ${PORT}`));

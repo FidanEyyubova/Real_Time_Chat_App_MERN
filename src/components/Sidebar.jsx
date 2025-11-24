@@ -1,8 +1,8 @@
 import { useContext, useEffect, useState } from "react";
 import { useNavigate } from "react-router-dom";
-import assets from "../assets/data";
 import { AuthContext } from "../../context/AuthContext";
 import { ChatContext } from "../../context/ChatContext";
+import assets from "../assets/data";
 
 const Sidebar = () => {
   const {
@@ -18,7 +18,6 @@ const Sidebar = () => {
   const [searchInput, setSearchInput] = useState("");
   const navigate = useNavigate();
 
-  // Filter users based on search input
   const filteredUsers = searchInput
     ? users.filter((user) =>
         user.fullName.toLowerCase().includes(searchInput.toLowerCase())
