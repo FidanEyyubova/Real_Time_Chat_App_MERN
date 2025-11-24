@@ -79,7 +79,7 @@ const Sidebar = () => {
         </div>
       </div>
 
-      <div className="flex flex-col">
+      <div className="flex flex-col gap-2">
         {filteredUsers.map((user) => (
           <div
             key={user._id}
@@ -87,7 +87,7 @@ const Sidebar = () => {
               setSelectedUser(user);
               setUnseenMessages((prev) => ({ ...prev, [user._id]: 0 }));
             }}
-            className={`relative flex items-center gap-2 p-3 pl-4 rounded  transition-transform duration-200 hover:bg-[#332142]/50 cursor-pointer max-sm:text-sm ${
+            className={`relative flex items-center gap-2 p-2 pl-4 rounded  transition-transform duration-200 hover:bg-[#332142]/50 cursor-pointer max-sm:text-sm ${
               selectedUser?._id === user._id && "bg-[#332142]/50"
             }`}
           >
