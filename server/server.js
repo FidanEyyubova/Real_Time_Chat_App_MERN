@@ -9,40 +9,40 @@ import { Server } from "socket.io";
 import Message from "./models/Message.js";
 import User from "./models/User.js";
 
-// Express & HTTP server
 const app = express();
 const server = http.createServer(app);
 
-// Socket.IO server
 export const io = new Server(server, {
   cors: { origin: "*" },
 });
 
-// Store online users
 export const userSocketMap = {};
 
-// Middleware
 app.use(express.json({ limit: "10mb" }));
 app.use(cors());
 
-// Routes
-app.use("/api/status", (res) => res.send("Server is live"));
+app.get("/api/status", (req, res) => res.send("Server is live"));
 app.use("/api/auth", userRouter);
 app.use("/api/messages", messageRouter);
 
-// Socket.IO connection
+// SOCKET HANDLER
 io.on("connection", (socket) => {
-  const userId = socket.handshake.query.userId;
-  console.log("User Connected:", userId);
+  const userId = socket.handshake.auth?.userId;
+  console.log("User connected:", userId);
 
-  if (userId) userSocketMap[userId] = socket.id;
+  if (!userId) {
+    console.log("No userId → disconnect");
+    return socket.disconnect(true);
+  }
+
+  userSocketMap[userId] = socket.id;
   io.emit("getOnlineUsers", Object.keys(userSocketMap));
 
   socket.on("sendMessage", async (messageData) => {
     try {
       const newMessage = await Message.create(messageData);
-
       const receiverSocket = userSocketMap[messageData.receiverID];
+
       if (receiverSocket) {
         io.to(receiverSocket).emit("receiveMessage", newMessage);
       }
@@ -51,6 +51,7 @@ io.on("connection", (socket) => {
     }
   });
 
+  // DELETE USER
   socket.on("deleteUser", async (userID) => {
     try {
       const user = await User.findById(userID);
@@ -68,8 +69,9 @@ io.on("connection", (socket) => {
     }
   });
 
+  // DISCONNECT
   socket.on("disconnect", () => {
-    console.log("User Disconnected:", userId);
+    console.log("User disconnected:", userId);
     if (userId && userSocketMap[userId]) {
       delete userSocketMap[userId];
       io.emit("getOnlineUsers", Object.keys(userSocketMap));
@@ -78,12 +80,9 @@ io.on("connection", (socket) => {
 });
 
 await connectMongoDb();
-
 if (process.env.NODE_ENV !== "production") {
-  
   const PORT = process.env.PORT || 5000;
   server.listen(PORT, () => console.log(`Server running on PORT: ${PORT}`));
 }
 
-export default server
-
+export default server;

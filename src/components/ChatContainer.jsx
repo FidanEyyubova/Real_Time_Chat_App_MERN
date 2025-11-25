@@ -24,7 +24,7 @@ const ChatContainer = () => {
 
   useEffect(() => {
     if (authUser) {
-      socket = io("http://localhost:5000", { query: { userId: authUser._id } });
+      socket = io("http://localhost:5000", { auth: { userId: authUser._id } });
     }
   }, [authUser]);
 
