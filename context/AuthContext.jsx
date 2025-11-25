@@ -14,28 +14,46 @@ const AuthProvider = ({ children }) => {
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [socket, setSocket] = useState(null);
 
+  // ✔️ FRONTEND CHECK AUTH (correct)
   const checkAuth = async () => {
     try {
-      const { data } = await axios.get("/api/auth/check");
+      const { data } = await axios.get("/api/auth/check", {
+        headers: { token: localStorage.getItem("token") },
+      });
+
       if (data.success) {
         setAuthUser(data.user);
         connectSocket(data.user);
       }
     } catch (error) {
-      toast.error(error.message);
+      // Token invalid → Logout
+      localStorage.removeItem("token");
+      setToken(null);
     }
   };
 
-  //Login section
+  // ✔️ Only one useEffect
+  useEffect(() => {
+    const localToken = localStorage.getItem("token");
+
+    if (localToken) {
+      axios.defaults.headers.common["token"] = localToken;
+      setToken(localToken);
+      checkAuth();
+    }
+  }, []);
+
+  // Login section
   const login = async (state, credentials) => {
     try {
       const { data } = await axios.post(`/api/auth/${state}`, credentials);
+
       if (data.success) {
         setAuthUser(data.userData);
-        connectSocket(data.userData);
         axios.defaults.headers.common["token"] = data.token;
         setToken(data.token);
         localStorage.setItem("token", data.token);
+        connectSocket(data.userData);
         toast.success(data.message);
       } else {
         toast.error(data.message);
@@ -45,7 +63,7 @@ const AuthProvider = ({ children }) => {
     }
   };
 
-  //Logout section
+  // Logout section
   const logout = async (showToast = true) => {
     localStorage.removeItem("token");
     setToken(null);
@@ -54,12 +72,10 @@ const AuthProvider = ({ children }) => {
     axios.defaults.headers.common["token"] = null;
     if (socket) socket.disconnect();
 
-    if (showToast) {
-      toast.success("Logged out successfully");
-    }
+    if (showToast) toast.success("Logged out successfully");
   };
 
-  //Update section
+  // Update profile
   const updateProfile = async (body) => {
     try {
       const { data } = await axios.put("/api/auth/update-profile", body);
@@ -72,7 +88,7 @@ const AuthProvider = ({ children }) => {
     }
   };
 
-  //Delete profile image section
+  // Delete profile image
   const deleteProfileImage = async () => {
     try {
       const { data } = await axios.put("/api/auth/update-profile", {
@@ -87,7 +103,7 @@ const AuthProvider = ({ children }) => {
     }
   };
 
-  //Delete user account section
+  // Delete user account
   const deleteUser = async () => {
     try {
       const { data } = await axios.delete("/api/auth/delete-user", {
@@ -105,14 +121,14 @@ const AuthProvider = ({ children }) => {
     }
   };
 
-  //Connect socket section
+  // Connect socket
   const connectSocket = (userData) => {
     if (!userData || socket?.connected) return;
+
     const newSocket = io(backendUrl, {
-      query: {
-        userId: userData._id,
-      },
+      query: { userId: userData._id },
     });
+
     newSocket.connect();
     setSocket(newSocket);
 
@@ -120,13 +136,6 @@ const AuthProvider = ({ children }) => {
       setOnlineUsers(userIds);
     });
   };
-
-  useEffect(() => {
-    if (token) {
-      axios.defaults.headers.common["token"] = token;
-    }
-    checkAuth();
-  }, []);
 
   const value = {
     axios,
