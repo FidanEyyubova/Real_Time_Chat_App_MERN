@@ -14,7 +14,6 @@ const AuthProvider = ({ children }) => {
   const [onlineUsers, setOnlineUsers] = useState([]);
   const [socket, setSocket] = useState(null);
 
-  // ✔️ FRONTEND CHECK AUTH (correct)
   const checkAuth = async () => {
     try {
       const { data } = await axios.get("/api/auth/check", {
@@ -26,13 +25,12 @@ const AuthProvider = ({ children }) => {
         connectSocket(data.user);
       }
     } catch (error) {
-      // Token invalid → Logout
       localStorage.removeItem("token");
       setToken(null);
     }
   };
 
-  // ✔️ Only one useEffect
+  //On page load
   useEffect(() => {
     const localToken = localStorage.getItem("token");
 
@@ -43,7 +41,7 @@ const AuthProvider = ({ children }) => {
     }
   }, []);
 
-  // Login section
+  //Login
   const login = async (state, credentials) => {
     try {
       const { data } = await axios.post(`/api/auth/${state}`, credentials);
@@ -53,6 +51,7 @@ const AuthProvider = ({ children }) => {
         axios.defaults.headers.common["token"] = data.token;
         setToken(data.token);
         localStorage.setItem("token", data.token);
+
         connectSocket(data.userData);
         toast.success(data.message);
       } else {
@@ -63,19 +62,21 @@ const AuthProvider = ({ children }) => {
     }
   };
 
-  // Logout section
+  //Logout
   const logout = async (showToast = true) => {
     localStorage.removeItem("token");
     setToken(null);
     setAuthUser(null);
     setOnlineUsers([]);
+
     axios.defaults.headers.common["token"] = null;
+
     if (socket) socket.disconnect();
 
     if (showToast) toast.success("Logged out successfully");
   };
 
-  // Update profile
+  //Update profile
   const updateProfile = async (body) => {
     try {
       const { data } = await axios.put("/api/auth/update-profile", body);
@@ -88,12 +89,13 @@ const AuthProvider = ({ children }) => {
     }
   };
 
-  // Delete profile image
+  //Delete profile image
   const deleteProfileImage = async () => {
     try {
       const { data } = await axios.put("/api/auth/update-profile", {
         profilePic: null,
       });
+
       if (data.success) {
         setAuthUser(data.user);
         toast.success("Profile image deleted successfully");
@@ -103,7 +105,7 @@ const AuthProvider = ({ children }) => {
     }
   };
 
-  // Delete user account
+  //Delete user
   const deleteUser = async () => {
     try {
       const { data } = await axios.delete("/api/auth/delete-user", {
@@ -121,21 +123,23 @@ const AuthProvider = ({ children }) => {
     }
   };
 
-  // Connect socket
   const connectSocket = (userData) => {
-    if (!userData || socket?.connected) return;
+  if (!userData) return;
+  if (socket?.connected) return;
 
-    const newSocket = io(backendUrl, {
-      query: { userId: userData._id },
-    });
+  const newSocket = io(backendUrl, {
+    auth: { userId: userData._id },
+    transports: ["websocket"],
+    reconnection: false,
+  });
 
-    newSocket.connect();
-    setSocket(newSocket);
+  setSocket(newSocket);
 
-    newSocket.on("getOnlineUsers", (userIds) => {
-      setOnlineUsers(userIds);
-    });
-  };
+  newSocket.on("connect", () => console.log("Socket connected:", newSocket.id));
+  newSocket.on("getOnlineUsers", (userIds) => setOnlineUsers(userIds));
+  newSocket.on("disconnect", () => console.log("Socket disconnected"));
+};
+
 
   const value = {
     axios,
