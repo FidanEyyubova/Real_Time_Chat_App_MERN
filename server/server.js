@@ -12,25 +12,21 @@ import User from "./models/User.js";
 const app = express();
 const server = http.createServer(app);
 
-// ⚠️ MÜTLƏQ: Öz Frontend Render URL-inizi buraya yazın
 const FRONTEND_URL = "https://real-time-chat-app-mern-frontend.onrender.com";
 
 
 // Socket.IO config
 export const io = new Server(server, {
   cors: { 
-    origin: FRONTEND_URL, // ✅ Təhlükəsiz Socket.IO CORS tənzimləməsi
-    methods: ["GET", "POST"], // Əlavə olaraq methodları da qeyd edə bilərsiniz
+    origin: FRONTEND_URL,
+    methods: ["GET", "POST"],
     credentials: true
   },
 });
 
-// Online users map
 export const userSocketMap = {};
 
-// Middleware
 app.use(express.json({ limit: "10mb" }));
-// ⭐️ DÜZƏLİŞ: Express CORS middleware-i üçün də origin təyin edilir.
 app.use(cors({ origin: FRONTEND_URL, credentials: true })); 
 
 
@@ -39,7 +35,6 @@ app.get("/api/status", (req, res) => res.send("Server is live"));
 app.use("/api/auth", userRouter);
 app.use("/api/messages", messageRouter);
 
-// SOCKET HANDLER (Bu hissə dəyişməyib)
 io.on("connection", (socket) => {
   const userId = socket.handshake.auth?.userId;
   console.log("User connected:", userId);
@@ -49,7 +44,6 @@ io.on("connection", (socket) => {
     return socket.disconnect(true);
   }
 
-  // Save user socket
   userSocketMap[userId] = socket.id;
   io.emit("getOnlineUsers", Object.keys(userSocketMap));
 
@@ -97,7 +91,6 @@ io.on("connection", (socket) => {
 
 await connectMongoDb();
 
-// IMPORTANT: Vercel bu hissəni ignore edir, amma local üçün qalır
   const PORT = process.env.PORT || 5000;
   server.listen(PORT, () => console.log(`Server running on PORT: ${PORT}`));
 
