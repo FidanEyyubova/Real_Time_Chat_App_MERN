@@ -9,17 +9,30 @@ import { Server } from "socket.io";
 import Message from "./models/Message.js";
 import User from "./models/User.js";
 
+const allowedOrigins = [
+  "https://real-time-chat-app-mern-ruddy.vercel.app", // production
+  "http://localhost:5173", // dev frontend
+];
+
 const app = express();
 const server = http.createServer(app);
 
 export const io = new Server(server, {
-  cors: { origin: "*" },
+  cors: {
+    origin: allowedOrigins,
+    methods: ["GET", "POST"],
+    credentials: true,
+  },
 });
+
 
 export const userSocketMap = {};
 
 app.use(express.json({ limit: "10mb" }));
-app.use(cors());
+app.use(cors({
+  origin: allowedOrigins,
+  credentials: true,
+}));
 
 app.get("/api/status", (req, res) => res.send("Server is live"));
 app.use("/api/auth", userRouter);
