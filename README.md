@@ -1,8 +1,8 @@
-#  **Chitchat** 
+#  💬**Chitchat** 
 
 A modern, real-time chat application built with the MERN stack (MongoDB, Express.js, React.js, Node.js). This app allows users to send and receive messages instantly, making conversations fast, seamless, and interactive.
 
-**Key Features:**
+## **Key Features:**
 
 -- Real-time messaging powered by Socket.io
 
@@ -17,7 +17,7 @@ A modern, real-time chat application built with the MERN stack (MongoDB, Express
 -- Notifications and alerts with React Hot Toast
 
 
-**Technologies Used:**
+## **Technologies Used:**
 
 **-- Backend:** Node.js, Express.js, MongoDB Atlas, Socket.io, Bcrypt.js, Cloudinary, CORS, dotenv, etc.
 
